@@ -15,7 +15,7 @@ deno task api
 或者直接运行：
 
 ```bash
-deno run --allow-net --allow-env --allow-read --allow-write --allow-run api.ts
+deno run --allow-net --allow-env --allow-read --allow-write --allow-run main.ts
 ```
 
 服务默认运行在 `http://localhost:8000`
