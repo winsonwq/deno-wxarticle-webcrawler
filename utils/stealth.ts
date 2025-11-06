@@ -1,19 +1,21 @@
 import puppeteer from 'https://github.com/lucacasonato/deno-puppeteer/raw/main/mod.ts';
 import { getRandomUserAgent, getRandomViewport } from "./userAgent.ts";
 import { findChromePath } from "./chrome.ts";
-import { getPlatformFromUserAgent, detectPlatform } from "./platform.ts";
+import { detectPlatform } from "./platform.ts";
 
 // 定义页面类型
 export type Page = Awaited<ReturnType<Awaited<ReturnType<typeof puppeteer.launch>>['newPage']>>;
 
 /**
  * 创建反检测浏览器实例
+ * 始终模拟 macOS 环境
  */
 export async function createStealthBrowser() {
-  const userAgent = getRandomUserAgent();
+  // 始终使用 macOS User-Agent
+  const userAgent = getRandomUserAgent('macOS');
   const viewport = getRandomViewport();
   
-  console.log(`使用用户代理: ${userAgent}`);
+  console.log(`模拟平台: macOS, 使用用户代理: ${userAgent}`);
   console.log(`使用视口大小: ${viewport.width}x${viewport.height}`);
 
   const chromePath = findChromePath();
@@ -80,17 +82,19 @@ export async function createStealthBrowser() {
 
 /**
  * 设置页面反检测
+ * 始终模拟 macOS 环境
  * @param page - Puppeteer 页面对象
  * @param url - 目标URL（可选，用于设置正确的 Referer）
  */
 export async function setupStealthPage(page: Page, url?: string): Promise<void> {
-  const userAgent = getRandomUserAgent();
+  // 始终使用 macOS User-Agent
+  const userAgent = getRandomUserAgent('macOS');
   
-  // 根据 User-Agent 获取匹配的平台标识，确保一致性
-  const platformString = getPlatformFromUserAgent(userAgent);
+  // 始终使用 macOS 平台标识
+  const platformString = '"macOS"';
   const actualPlatform = detectPlatform();
   
-  console.log(`实际平台: ${actualPlatform}, User-Agent 平台: ${platformString}`);
+  console.log(`实际平台: ${actualPlatform}, 模拟平台: macOS`);
   
   // 设置用户代理
   await page.setUserAgent(userAgent);

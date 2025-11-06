@@ -38,37 +38,14 @@ export const VIEWPORT_SIZES = [
 ];
 
 /**
- * 获取随机用户代理（优先选择与平台匹配的）
- * @param preferPlatformMatch - 是否优先选择与平台匹配的 User-Agent（默认 true）
+ * 获取随机用户代理
+ * @param mockPlatform - 要模拟的平台，如果指定则始终使用该平台的 User-Agent（默认 'macOS'）
  */
-export function getRandomUserAgent(preferPlatformMatch: boolean = true): string {
-  if (!preferPlatformMatch) {
-    return ALL_USER_AGENTS[Math.floor(Math.random() * ALL_USER_AGENTS.length)];
-  }
-  
-  // 检测当前平台
-  const platform = Deno.build.os;
-  let platformKey: 'macOS' | 'Windows' | 'Linux' = 'Linux';
-  
-  switch (platform) {
-    case 'darwin':
-      platformKey = 'macOS';
-      break;
-    case 'linux':
-      platformKey = 'Linux';
-      break;
-    case 'windows':
-      platformKey = 'Windows';
-      break;
-  }
-  
-  // 80% 概率选择匹配平台的 User-Agent，20% 概率随机选择
-  if (Math.random() < 0.8) {
-    const platformAgents = USER_AGENTS[platformKey];
-    return platformAgents[Math.floor(Math.random() * platformAgents.length)];
-  } else {
-    return ALL_USER_AGENTS[Math.floor(Math.random() * ALL_USER_AGENTS.length)];
-  }
+export function getRandomUserAgent(mockPlatform?: 'macOS' | 'Windows' | 'Linux'): string {
+  // 默认模拟 macOS
+  const targetPlatform = mockPlatform || 'macOS';
+  const platformAgents = USER_AGENTS[targetPlatform];
+  return platformAgents[Math.floor(Math.random() * platformAgents.length)];
 }
 
 /**
