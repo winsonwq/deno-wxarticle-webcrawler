@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "api": "deno run --allow-net --allow-env --allow-read --allow-write --allow-run api.ts",
+    "api": "deno run --allow-net --allow-env --allow-read --allow-write --allow-run main.ts",
     "fetch": "deno run --allow-net --allow-read --allow-write --allow-run fetchPage.ts"
   },
   "imports": {
