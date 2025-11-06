@@ -5,6 +5,9 @@
   },
   "imports": {
     "puppeteer": "https://deno.land/x/puppeteer@16.2.0/mod.ts"
+  },
+  "compilerOptions": {
+    "lib": ["deno.ns", "dom"]
   }
 }
 
