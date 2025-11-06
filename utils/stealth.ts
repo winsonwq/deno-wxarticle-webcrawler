@@ -1,6 +1,7 @@
 import puppeteer from 'https://github.com/lucacasonato/deno-puppeteer/raw/main/mod.ts';
 import { getRandomUserAgent, getRandomViewport } from "./userAgent.ts";
 import { findChromePath } from "./chrome.ts";
+import { getPlatformFromUserAgent, detectPlatform } from "./platform.ts";
 
 // 定义页面类型
 export type Page = Awaited<ReturnType<Awaited<ReturnType<typeof puppeteer.launch>>['newPage']>>;
@@ -79,9 +80,17 @@ export async function createStealthBrowser() {
 
 /**
  * 设置页面反检测
+ * @param page - Puppeteer 页面对象
+ * @param url - 目标URL（可选，用于设置正确的 Referer）
  */
-export async function setupStealthPage(page: Page): Promise<void> {
+export async function setupStealthPage(page: Page, url?: string): Promise<void> {
   const userAgent = getRandomUserAgent();
+  
+  // 根据 User-Agent 获取匹配的平台标识，确保一致性
+  const platformString = getPlatformFromUserAgent(userAgent);
+  const actualPlatform = detectPlatform();
+  
+  console.log(`实际平台: ${actualPlatform}, User-Agent 平台: ${platformString}`);
   
   // 设置用户代理
   await page.setUserAgent(userAgent);
@@ -90,22 +99,30 @@ export async function setupStealthPage(page: Page): Promise<void> {
   const viewport = getRandomViewport();
   await page.setViewport(viewport);
   
+  // 根据目标URL设置正确的 Referer 和 Sec-Fetch-Site
+  const isWechatUrl = url && url.includes('mp.weixin.qq.com');
+  const referer = isWechatUrl ? 'https://mp.weixin.qq.com/' : 'https://www.google.com/';
+  const secFetchSite = isWechatUrl ? 'same-origin' : 'none';
+  
   // 设置额外的HTTP头
-  await page.setExtraHTTPHeaders({
+  const headers: Record<string, string> = {
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
     'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8',
     'Accept-Encoding': 'gzip, deflate, br',
     'Cache-Control': 'max-age=0',
     'Connection': 'keep-alive',
+    'Referer': referer,
     'Sec-Fetch-Dest': 'document',
     'Sec-Fetch-Mode': 'navigate',
-    'Sec-Fetch-Site': 'none',
+    'Sec-Fetch-Site': secFetchSite,
     'Sec-Fetch-User': '?1',
     'Upgrade-Insecure-Requests': '1',
     'sec-ch-ua': '"Not_A Brand";v="8", "Chromium";v="120", "Google Chrome";v="120"',
     'sec-ch-ua-mobile': '?0',
-    'sec-ch-ua-platform': '"macOS"'
-  });
+    'sec-ch-ua-platform': platformString
+  };
+  
+  await page.setExtraHTTPHeaders(headers);
 
   // 注入反检测脚本
   await page.evaluateOnNewDocument(() => {

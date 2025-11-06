@@ -11,8 +11,8 @@ export async function fetchPage(url: string): Promise<string> {
   const page = await browser.newPage();
 
   try {
-    // 设置反检测页面
-    await setupStealthPage(page);
+    // 设置反检测页面（传入URL以便设置正确的Referer）
+    await setupStealthPage(page, url);
 
     // 访问页面
     await page.goto(url, { 
