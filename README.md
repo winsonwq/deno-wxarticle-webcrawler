@@ -20,6 +20,73 @@ deno run --allow-net --allow-env --allow-read --allow-write --allow-run main.ts
 
 服务默认运行在 `http://localhost:8000`
 
+## 使用 PM2 长期运行（推荐用于生产环境）
+
+### 安装 PM2
+
+```bash
+npm install -g pm2
+```
+
+### 启动服务
+
+使用配置文件启动：
+
+```bash
+pm2 start ecosystem.config.cjs
+```
+
+或者直接启动：
+
+```bash
+pm2 start deno --name wxarticle-api --interpreter none -- \
+  run --allow-net --allow-env --allow-read --allow-write --allow-run main.ts
+```
+
+### PM2 常用命令
+
+```bash
+# 查看运行状态
+pm2 status
+
+# 查看日志
+pm2 logs wxarticle-api
+
+# 停止服务
+pm2 stop wxarticle-api
+
+# 重启服务
+pm2 restart wxarticle-api
+
+# 删除服务
+pm2 delete wxarticle-api
+
+# 设置开机自启
+pm2 startup
+pm2 save
+```
+
+### 自定义端口
+
+修改 `ecosystem.config.cjs` 中的 `PORT` 环境变量，或使用环境变量启动：
+
+```bash
+PORT=3000 pm2 start ecosystem.config.cjs --update-env
+```
+
+### 日志文件
+
+日志文件保存在 `./logs/` 目录下：
+- `pm2-error.log`: 错误日志
+- `pm2-out.log`: 标准输出日志
+- `pm2-combined.log`: 合并日志
+
+首次运行前需要创建日志目录：
+
+```bash
+mkdir -p logs
+```
+
 ## API 使用示例
 
 ### GET 请求
